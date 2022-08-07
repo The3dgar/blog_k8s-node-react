@@ -1,0 +1,36 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client-depl
+  labels:
+    app: client
+spec:
+  replicas: 1 # number of pods to deploy
+  selector: # selectors are used to select pods for deployment
+    matchLabels: 
+      app: client # match pods with this label
+  template: # template is used to define pod spec
+    metadata:
+      labels: 
+        app: client
+    spec: # spec is used to define pod spec
+      containers:
+        - name: client
+          image: blog_client
+          imagePullPolicy: IfNotPresent
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: client-srv
+spec:
+  type: ClusterIP
+  selector:
+    app: client
+  ports:
+    - name: client
+      port: 3000
+      targetPort: 3000
+      protocol: TCP

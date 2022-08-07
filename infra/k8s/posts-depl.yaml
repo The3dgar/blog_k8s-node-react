@@ -1,0 +1,41 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: posts-depl
+  labels:
+    app: posts
+spec:
+  replicas: 1 # number of pods to deploy
+  selector: # selectors are used to select pods for deployment
+    matchLabels: 
+      app: posts # match pods with this label
+  template: # template is used to define pod spec
+    metadata:
+      labels: 
+        app: posts
+    spec: # spec is used to define pod spec
+      containers:
+        - name: posts
+          image: blog_services
+          imagePullPolicy: IfNotPresent
+          command: ["yarn", "posts"]
+          env:
+            - name: EVENT_BUS_SERVICE
+              value: "http://event-bus-srv:4005"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: posts-clusterip-srv
+spec:
+  type: ClusterIP
+  selector:
+    app: posts
+  ports:
+    - name: posts
+      port: 4000
+      targetPort: 4000
+      protocol: TCP
